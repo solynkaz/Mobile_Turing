@@ -16,6 +16,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextGeometricTransform
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -39,6 +41,7 @@ fun Turing_IF() {
     val toDeleteCell = remember { mutableStateOf(false) }
     val toAddState = remember { mutableStateOf(false) }
     val toDeleteState = remember { mutableStateOf(false) }
+    val toProcess = remember { mutableStateOf(false) }
 
     val firstLoad = remember { mutableStateOf(true) }
 
@@ -51,6 +54,7 @@ fun Turing_IF() {
     val countOfAlphabetCells = remember { mutableStateOf(0) }
     val turingAlphabet = remember { ArrayList<MutableState<String>>() }
     val turingStates = remember { mutableMapOf<String, ArrayList<MutableState<String>>>() }
+    val turingLine = remember { mutableStateOf("") }
 
     if (firstLoad.value) {
         for (i in 0 until 4) {
@@ -81,10 +85,10 @@ fun Turing_IF() {
         toDeleteCell.value = false
     }
     if (toAddState.value) {
-        val key = "q${turingStates.keys.size+1}"
+        val key = "q${turingStates.keys.size + 1}"
         turingStates[key] = arrayListOf()
         for (i in 0 until countOfAlphabetCells.value) {
-            turingStates[key]!!.add(remember { mutableStateOf("")})
+            turingStates[key]!!.add(remember { mutableStateOf("") })
         }
         toAddState.value = false
     }
@@ -93,21 +97,57 @@ fun Turing_IF() {
         toDeleteState.value = false
     }
 
+    if (toProcess.value) {
+        var temp = turingLine.value.toMutableList()
+        val alphabet = mutableListOf<String>()
+        for (word in turingAlphabet) {
+            alphabet.add(word.value)
+        }
+        var index = 0
+
+        var keyState = "q1"
+        var operation = ' '
+        var move = ' '
+        var i = 0
+        var head = 0
+        while (true) {
+            index = alphabet.indexOf(temp[head].toString())
+
+        }
+    }
     Column(
         Modifier
             .padding(top = 10.dp)
     ) {
+        Row(Modifier.fillMaxWidth()) {
+            OutlinedTextField(
+                textStyle = TextStyle(fontSize = 15.sp),
+                isError = false,
+                enabled = true,
+                singleLine = true,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(start = 5.dp, end = 5.dp, bottom = 5.dp),
+                value = turingLine.value,
+                onValueChange = { letter ->
+                    turingLine.value = letter
+                },
+            )
+        }
         //Ряд алфавита, расширяется
         Row(Modifier.padding(horizontal = 10.dp)) {
             Text(
-                "Alphabet\n\nStates",
+                text = "\nAБВ",
                 Modifier
                     .size(60.dp)
-                    .weight(0.7f)
+                    .weight(0.7f),
+                fontSize = 14.sp,
+                softWrap = false,
+                overflow = TextOverflow.Visible
             )
             for (i in 0 until countOfAlphabetCells.value) {
                 OutlinedTextField(
-                    textStyle = TextStyle(fontSize = 15.sp),
+                    textStyle = TextStyle(fontSize = 17.sp),
                     isError = false,
                     enabled = true,
                     singleLine = true,
@@ -132,7 +172,7 @@ fun Turing_IF() {
                 )
                 for (i in 0 until turingStates[key]!!.count()) {
                     OutlinedTextField(
-                        textStyle = TextStyle(fontSize = 15.sp),
+                        textStyle = TextStyle(fontSize = 13.sp),
                         isError = false,
                         enabled = true,
                         singleLine = true,
@@ -148,7 +188,7 @@ fun Turing_IF() {
             }
         }
         //Кнопки плюс и минус ячейки
-        Row(Modifier.padding(horizontal = 10.dp,vertical = 5.dp)) {
+        Row(Modifier.padding(horizontal = 10.dp, vertical = 5.dp)) {
             Button(
                 enabled = true,
                 modifier = buttonModifier
