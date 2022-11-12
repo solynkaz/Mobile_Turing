@@ -98,22 +98,69 @@ fun Turing_IF() {
     }
 
     if (toProcess.value) {
-        var temp = turingLine.value.toMutableList()
+        var temp = turingLine.value.toString()
         val alphabet = mutableListOf<String>()
         for (word in turingAlphabet) {
             alphabet.add(word.value)
         }
         var index = 0
-
         var keyState = "q1"
+        var yacheyka = ""
         var operation = ' '
         var move = ' '
         var i = 0
         var head = 0
         while (true) {
             index = alphabet.indexOf(temp[head].toString())
-
+            yacheyka = if (index == -1) {
+                turingStates[keyState]!!.last().value.trim()
+            } else {
+                turingStates[keyState]!![index].value.trim()
+            }
+            //Проверка на длину ячейки состояния
+            if (yacheyka.length == 1) {
+                //Либо R либо L
+                when (yacheyka[0]) {
+                    'L' -> {
+                        if (head > 0) head--
+                        else {
+                            temp = " $temp"
+                        }
+                    }
+                    'R' -> {
+                        if (head < temp.length-1) head++
+                        else {
+                            temp = "$temp "
+                            head++
+                        }
+                    }
+                    '!' -> {
+                        break
+                    }
+                }
+            } else {
+                val tempArray = temp.toCharArray()
+                if (yacheyka[0] == '-') {
+                    tempArray[head] = ' '
+                } else tempArray[head] = yacheyka[0]
+                temp = String(tempArray)
+                if (yacheyka[1] == 'L') {
+                    if (head > 0) head--
+                    else {
+                        temp = " $temp"
+                    }
+                } else if (yacheyka[1] == 'R') {
+                    if (head < temp.length-1) head++
+                    else {
+                        temp = "$temp "
+                        head++
+                    }
+                }
+                keyState = ("${yacheyka[2]}${yacheyka[3]}")
+            }
         }
+        turingLine.value = temp.trim()
+        toProcess.value = false
     }
     Column(
         Modifier
@@ -280,6 +327,31 @@ fun Turing_IF() {
             ) {
                 Text(
                     text = "Удалить состояние",
+                    fontSize = 19.sp,
+                    fontWeight = FontWeight(600),
+                    color = buttonTextColor,
+                    textAlign = TextAlign.Center
+                )
+            }
+        }
+        Row(Modifier.fillMaxWidth().padding(top = 5.dp)) {
+            Button(
+                enabled = true,
+                modifier = buttonModifier
+                    .weight(1f)
+                    .fillMaxHeight()
+                    .padding(horizontal = 10.dp),
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = buttonColor,
+                    contentColor = Color.LightGray,
+                ),
+                contentPadding = PaddingValues(0.dp),
+                onClick = {
+                    if (turingLine.value != "") toProcess.value = true
+                }
+            ) {
+                Text(
+                    text = "Запустить",
                     fontSize = 19.sp,
                     fontWeight = FontWeight(600),
                     color = buttonTextColor,
