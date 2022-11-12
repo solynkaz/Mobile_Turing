@@ -39,6 +39,8 @@ fun alphabetCell(modifier: Modifier, value: String) {
 
 @Composable
 fun Turing_IF() {
+    val toAdd = remember { mutableStateOf(false) }
+    val toDelete = remember { mutableStateOf(false) }
     val firstLoad = remember { mutableStateOf(true) }
     val buttonTextColor = Color.White
     val buttonColor = Color(0xFF005BFF)
@@ -49,18 +51,35 @@ fun Turing_IF() {
     val turingAlphabet = remember { ArrayList<MutableState<String>>() }
     val countOfAlphabetCells = remember { mutableStateOf(0) }
     val turingStates = remember { mutableMapOf<String, ArrayList<MutableState<String>>>() }
-
     if (firstLoad.value) {
         for (i in 0 until 4) {
             turingAlphabet.add(remember { mutableStateOf("") })
             countOfAlphabetCells.value++
         }
+        turingStates["q1"] = (arrayListOf(remember { mutableStateOf("") },
+            remember { mutableStateOf("") },
+            remember { mutableStateOf("") },
+            remember { mutableStateOf("") }))
+        firstLoad.value = false
+
     }
-    turingStates["q1"] = (arrayListOf(remember { mutableStateOf("") },
-        remember { mutableStateOf("") },
-        remember { mutableStateOf("") },
-        remember { mutableStateOf("") }))
-    firstLoad.value = false
+    if (toAdd.value) {
+        turingAlphabet.add(remember { mutableStateOf("") })
+        countOfAlphabetCells.value++
+        for (key in turingStates.keys) {
+            turingStates[key]!!.add(remember { mutableStateOf("")})
+        }
+        toAdd.value = false
+    }
+    if (toDelete.value) {
+        turingAlphabet.removeLast()
+        countOfAlphabetCells.value--
+        for (key in turingStates.keys) {
+            turingStates[key]!!.removeLast()
+        }
+        toDelete.value = false
+    }
+
     Column(
         Modifier
             .padding(top = 10.dp)
@@ -128,7 +147,7 @@ fun Turing_IF() {
                 ),
                 contentPadding = PaddingValues(0.dp),
                 onClick = {
-
+                    if (countOfAlphabetCells.value < 6) toAdd.value = true
                 }
             ) {
                 Text(
@@ -149,7 +168,7 @@ fun Turing_IF() {
                 ),
                 contentPadding = PaddingValues(0.dp),
                 onClick = {
-
+                    if (countOfAlphabetCells.value > 2) toDelete.value = true
                 }
             ) {
                 Text(
